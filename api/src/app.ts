@@ -25,21 +25,5 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Express & TypeScript Server");
 });
 
-const runningMessage = `Server running at http://localhost:${port}`;
-
-new Config()
-  .start()
-  .then(() => {
-    server.listen(port, () => {
-      console.log(runningMessage);
-
-      routes.forEach((route: CommonRoutesConfig) => {
-        console.log(`Routes configured for ${route.getName()}`);
-      });
-    });
-  })
-  .catch((error) => {
-    console.log("Config Error ", error);
-  });
-
-  export default app;
+// ⚡ Export as a Serverless API
+export default app;
