@@ -25,6 +25,10 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Express & TypeScript Server");
 });
 
+<<<<<<< HEAD
+// ⚡ Export as a Serverless API
+export default app;
+=======
 const runningMessage = `Server running at http://localhost:${port}`;
 
 new Config()
@@ -41,3 +45,4 @@ new Config()
   .catch((error) => {
     console.log("Config Error ", error);
   });
+>>>>>>> parent of 085434b (changes)
