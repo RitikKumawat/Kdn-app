@@ -56,3 +56,5 @@ new Config()
   .catch((error) => {
     console.log("Config Error ", error);
   });
+
+  export default app;
