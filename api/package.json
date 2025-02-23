@@ -5,14 +5,13 @@
   "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/index.js",
+    "start": "node dist/app.js",
     "build": "tsc",
     "dev": "nodemon ./src/app.ts"
   },
   "dependencies": {
     "@types/json2csv": "^5.0.7",
     "@types/nodemailer": "^6.4.17",
-    "@vercel/node": "^5.1.8",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.6",
