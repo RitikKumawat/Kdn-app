@@ -16,7 +16,7 @@ exports.uploadCustomer = void 0;
 const jsonResponse_1 = require("../../utils/jsonResponse");
 const fs_1 = __importDefault(require("fs"));
 const xlsx_1 = __importDefault(require("xlsx"));
-const app_1 = require("../../app");
+// import { io } from "../../app";
 const dao_1 = require("../../dao");
 const BATCH_COUNT = 200;
 // Helper function to read Excel file and get data
@@ -90,10 +90,10 @@ const startUploadProcess = (filePath, socketToken) => __awaiter(void 0, void 0, 
                 return processRow(item, uploadItems, totalRows, process);
             })));
             const percentage = Math.round((process.processedRows / totalRows) * 100);
-            app_1.io.emit(socketChannel, {
-                percentage,
-                uploadItems,
-            });
+            // io.emit(socketChannel, {
+            //   percentage,
+            //   uploadItems,
+            // });
             dataBatch.length = 0;
         }
     }
@@ -103,10 +103,10 @@ const startUploadProcess = (filePath, socketToken) => __awaiter(void 0, void 0, 
             return processRow(item, uploadItems, totalRows, process);
         })));
         const percentage = Math.round((process.processedRows / totalRows) * 100);
-        app_1.io.emit(socketChannel, {
-            percentage,
-            uploadItems,
-        });
+        // io.emit(socketChannel, {
+        //   percentage,
+        //   uploadItems,
+        // });
     }
     fs_1.default.unlinkSync(filePath); // Delete the temporary uploaded file
 });

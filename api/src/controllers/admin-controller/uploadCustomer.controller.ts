@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { JsonResponse } from "../../utils/jsonResponse";
 import fs from "fs";
 import xlsx from "xlsx";
-import { io } from "../../app";
+// import { io } from "../../app";
 import { dao } from "../../dao";
 import { ICustomerModel } from "../../interfaces/models/customer.interface";
 
@@ -114,10 +114,10 @@ const startUploadProcess = async (filePath: string, socketToken: string) => {
       );
 
       const percentage = Math.round((process.processedRows / totalRows) * 100);
-      io.emit(socketChannel, {
-        percentage,
-        uploadItems,
-      });
+      // io.emit(socketChannel, {
+      //   percentage,
+      //   uploadItems,
+      // });
 
       dataBatch.length = 0;
     }
@@ -132,10 +132,10 @@ const startUploadProcess = async (filePath: string, socketToken: string) => {
     );
 
     const percentage = Math.round((process.processedRows / totalRows) * 100);
-    io.emit(socketChannel, {
-      percentage,
-      uploadItems,
-    });
+    // io.emit(socketChannel, {
+    //   percentage,
+    //   uploadItems,
+    // });
   }
 
   fs.unlinkSync(filePath); // Delete the temporary uploaded file
