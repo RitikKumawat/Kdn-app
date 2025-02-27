@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, Application } from "express";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import cors from "cors";
@@ -8,28 +8,51 @@ import { CommonRoutesConfig } from "./routes/common/common.routes";
 import { IndexRoutes } from "./routes/index/index.routes";
 import { Server } from "socket.io";
 import path from "path";
-import { VercelRequest, VercelResponse } from "@vercel/node"; // Add this for Vercel
-
+// Load environment variables
 dotenv.config();
 
-const app = express();
+const app: Application = express();
 const port = process.env.PORT ?? 4000;
 const routes: Array<CommonRoutesConfig> = [];
+const server = createServer(app);
 
+export const io = new Server(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+app.enable("trust proxy");
+
+// **CORS middleware** - Apply before defining routes
 app.use(cors());
-app.use(express.json());
 
+// Middleware to parse JSON requests
+app.use(express.json());
 app.set("rootDirectory", __dirname);
 app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
+// app.use("/images", express.static("images"));
 
 routes.push(new AdminRoutes(app));
 routes.push(new IndexRoutes(app));
-
 app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to Express & TypeScript Server on Vercel!");
+  res.send("Welcome to Express & TypeScript Server");
 });
 
-// **Export the handler for Vercel**
-export default (req: VercelRequest, res: VercelResponse) => {
-  return app(req, res);
-};
+const runningMessage = `Server running at http://localhost:${port}`;
+
+new Config()
+  .start()
+  .then(() => {
+    server.listen(port, () => {
+      console.log(runningMessage);
+
+      routes.forEach((route: CommonRoutesConfig) => {
+        console.log(`Routes configured for ${route.getName()}`);
+      });
+    });
+  })
+  .catch((error) => {
+    console.log("Config Error ", error);
+  });
