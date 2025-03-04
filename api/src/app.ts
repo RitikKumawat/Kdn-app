@@ -42,17 +42,23 @@ app.get("/", (req: Request, res: Response) => {
 
 const runningMessage = `Server running at http://localhost:${port}`;
 
-new Config()
-  .start()
-  .then(() => {
-    server.listen(port, () => {
-      console.log(runningMessage);
-
-      routes.forEach((route: CommonRoutesConfig) => {
-        console.log(`Routes configured for ${route.getName()}`);
-      });
-    });
+app.listen(port,()=>{
+  console.log("Server running on ",port);
+  routes.forEach((route:CommonRoutesConfig)=>{
+    console.log("ROUTES CONFIGURED FOR",route.getName());
   })
-  .catch((error) => {
-    console.log("Config Error ", error);
-  });
+})
+// new Config()
+//   .start()
+//   .then(() => {
+//     server.listen(port, () => {
+//       console.log(runningMessage);
+
+//       routes.forEach((route: CommonRoutesConfig) => {
+//         console.log(`Routes configured for ${route.getName()}`);
+//       });
+//     });
+//   })
+//   .catch((error) => {
+//     console.log("Config Error ", error);
+//   });
