@@ -6,8 +6,18 @@ export const convertInvoiceHtmlToPdf = async (
   fileName: string
 ) => {
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-gpu',
+      '--disable-dev-shm-usage', 
+      '--disable-software-rasterizer',
+      '--headless=new'
+    ],
+    timeout: 120000, 
+    protocolTimeout: 120000, 
   });
+  
   try {
     const page = await browser.newPage();
     await page.setContent(html);
