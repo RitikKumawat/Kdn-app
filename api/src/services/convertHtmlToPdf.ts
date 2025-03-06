@@ -4,15 +4,14 @@ import chromium from "chrome-aws-lambda";
 import fs from "fs/promises";
 
 export const convertInvoiceHtmlToPdf = async (html:string, fileName:string) => {
-  const executablePath = await chromium.executablePath; // Ensure it correctly fetches the path
-  
-  const browser = await puppeteer.launch({
-    executablePath: executablePath, // Ensure compatibility
-    headless: chromium.headless,
-    args: chromium.args, // Ensures smooth execution on Render
-  });
-
+  let browser;
   try {
+    browser = await puppeteer.launch({
+      executablePath: await chromium.executablePath || "/usr/bin/google-chrome-stable",
+      headless: true,
+      args: chromium.args, // Required for running in Render
+    });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: "networkidle0" });
 
@@ -27,7 +26,12 @@ export const convertInvoiceHtmlToPdf = async (html:string, fileName:string) => {
     });
 
     return filePath;
+  } catch (error) {
+    console.error("Puppeteer error:", error);
+    throw new Error("Failed to generate PDF.");
   } finally {
-    await browser.close(); // Ensure browser is always closed
+    if (browser) {
+      await browser.close();
+    }
   }
 };
