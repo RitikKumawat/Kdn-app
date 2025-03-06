@@ -8,6 +8,8 @@ import { CommonRoutesConfig } from "./routes/common/common.routes";
 import { IndexRoutes } from "./routes/index/index.routes";
 import { Server } from "socket.io";
 import path from "path";
+import { connectDb } from "./configuration/config-v2";
+import { ENV } from "./env/env";
 // Load environment variables
 dotenv.config();
 
@@ -42,8 +44,9 @@ app.get("/", (req: Request, res: Response) => {
 
 const runningMessage = `Server running at http://localhost:${port}`;
 
-app.listen(port,()=>{
+app.listen(port,async()=>{
   console.log("Server running on ",port);
+  await connectDb(ENV.MONGO_DB_URL as string);
   routes.forEach((route:CommonRoutesConfig)=>{
     console.log("ROUTES CONFIGURED FOR",route.getName());
   })
