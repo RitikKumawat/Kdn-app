@@ -4,20 +4,12 @@ import chromium from "chrome-aws-lambda";
 import fs from "fs/promises";
 
 export const convertInvoiceHtmlToPdf = async (html:string, fileName:string) => {
+  const executablePath = await chromium.executablePath; // Ensure it correctly fetches the path
+  
   const browser = await puppeteer.launch({
-    executablePath: await chromium.executablePath || "/usr/bin/google-chrome-stable",
-    headless: true,
-    args: [
-      "--no-sandbox",
-      "--disable-setuid-sandbox",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-      "--disable-software-rasterizer",
-      "--headless=new",
-      ...chromium.args, // Ensure compatibility with serverless environments
-    ],
-    timeout: 120000,
-    protocolTimeout: 120000,
+    executablePath: executablePath, // Ensure compatibility
+    headless: chromium.headless,
+    args: chromium.args, // Ensures smooth execution on Render
   });
 
   try {
