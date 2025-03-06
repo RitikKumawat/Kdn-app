@@ -6,7 +6,6 @@ export const convertInvoiceHtmlToPdf = async (
   fileName: string
 ) => {
   const browser = await puppeteer.launch({
-    executablePath: "/usr/bin/chromium-browser", 
     headless: true,
     args: [
       '--no-sandbox',
