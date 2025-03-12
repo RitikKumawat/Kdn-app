@@ -7,64 +7,85 @@ import { generateFileUrl } from "../../utils/generateFileUrl";
 import { ITransactionModel } from "../../interfaces/models/transaction.interface";
 import { v4 as uuidv4 } from "uuid";
 
-const generateUniqueFileName = (): string => {
-  return uuidv4();
-};
-export const addTransaction = async (req: Request, res: Response) => {
-  const { customerId, paymentMode, amount } = req.body;
-  if (!customerId || !paymentMode || !amount) {
-    return JsonResponse(res, {
-      message: "All fields are required",
-      status: "error",
-      statusCode: 400,
-      title: "Provide all fields",
-    });
-  }
+const generateUniqueFileName = (): string => uuidv4();
 
-  const customer = await dao.customer.getById(customerId);
-  if (!customer) {
-    return JsonResponse(res, {
-      message: "Customer not found",
-      status: "error",
-      statusCode: 400,
-      title: "Customer not found",
-    });
-  }
-  const transactionData: Partial<ITransactionModel> = {
-    customerId: customer._id,
-    paymentMode: paymentMode,
-    amount: amount,
-    lastUpdatedBy: res.locals.userId,
-  };
-  const uniqueFileName = `${customer._id}_${generateUniqueFileName()}`;
-  await convertInvoiceHtmlToPdf(
-    invoiceTemplate({
-      name: `${customer.firstName} ${customer.lastName}`,
-      amount: amount,
-      paymentMode: paymentMode,
-    }),
-    uniqueFileName
-  ).then((generatePdfPath) => {
-    let fileUrl;
-    if (generatePdfPath) {
-      fileUrl = generateFileUrl(req, generatePdfPath);
-      transactionData["pdfPath"] = fileUrl;
+export const addTransaction = async (req: Request, res: Response) => {
+  try {
+    const { customerId, paymentMode, amount } = req.body;
+
+    // Validate input
+    if (!customerId || !paymentMode || !amount) {
+      return JsonResponse(res, {
+        message: "All fields are required",
+        status: "error",
+        statusCode: 400,
+        title: "Provide all fields",
+      });
     }
-  });
-  const transaction = await dao.transaction.addTransaction(transactionData);
-  if (!transaction) {
+
+    // Fetch customer details
+    const customer = await dao.customer.getById(customerId);
+    if (!customer) {
+      return JsonResponse(res, {
+        message: "Customer not found",
+        status: "error",
+        statusCode: 400,
+        title: "Customer not found",
+      });
+    }
+
+    // Prepare transaction data
+    const transactionData: Partial<ITransactionModel> = {
+      customerId: customer._id,
+      paymentMode,
+      amount,
+      lastUpdatedBy: res.locals.userId,
+    };
+
+    // Generate unique filename
+    const uniqueFileName = `${customer._id}_${generateUniqueFileName()}`;
+
+    // Generate invoice PDF
+    const generatePdfPath = await convertInvoiceHtmlToPdf(
+      invoiceTemplate({
+        name: `${customer.firstName} ${customer.lastName}`,
+        amount,
+        paymentMode,
+      }),
+      uniqueFileName
+    );
+
+    // Add PDF path if successful
+    if (generatePdfPath) {
+      transactionData.pdfPath = generateFileUrl(req, generatePdfPath);
+    }
+
+    // Save transaction in database
+    const transaction = await dao.transaction.addTransaction(transactionData);
+    if (!transaction) {
+      return JsonResponse(res, {
+        message: "Could not add transaction",
+        status: "error",
+        statusCode: 500,
+        title: "Transaction failed",
+      });
+    }
+
+    // Success response
     return JsonResponse(res, {
-      message: "Could not add transaction",
+      message: "Transaction added successfully",
+      status: "success",
+      statusCode: 201,
+      title: "Success",
+      data: transaction,
+    });
+  } catch (error) {
+    console.error("Error in addTransaction:", error);
+    return JsonResponse(res, {
+      message: "Internal Server Error",
       status: "error",
-      statusCode: 400,
-      title: "Failed to add transaction",
+      statusCode: 500,
+      title: "Error",
     });
   }
-  return JsonResponse(res, {
-    message: "Successfully added transaction",
-    status: "success",
-    statusCode: 200,
-    title: "Successfully added transaction",
-    data: transaction,
-  });
 };
