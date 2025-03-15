@@ -25,7 +25,7 @@ const SignInScreen = () => {
       password: '',
     },
   });
-  const {mutateAsync} = useLoginMutation();
+  const {mutateAsync, isPending} = useLoginMutation();
   const onSubmit = async (data: FormData) => {
     console.log('Form Data:', data);
     const res = await mutateAsync({
@@ -98,8 +98,12 @@ const SignInScreen = () => {
         </View>
 
         {/* Submit Button */}
-        <TouchableOpacity style={styles.btn} onPress={handleSubmit(onSubmit)}>
-          <Text style={styles.btnText}>Sign In</Text>
+        <TouchableOpacity style={styles.btn} disabled={isPending} onPress={handleSubmit(onSubmit)}>
+          {isPending ? (
+            <Text style={styles.btnText}>Signing In.....</Text>
+          ) : (
+            <Text style={styles.btnText}>Sign In</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
