@@ -1,35 +1,41 @@
-# Use official Node.js image with slim base
-FROM node:20-slim
+FROM node:20-alpine
 
-# Install Chromium dependencies required by Puppeteer
-RUN apt-get update && apt-get install -y \
-    wget \
+# Set timezone
+ENV TZ="Asia/Kolkata"
+
+# Set Puppeteer Chromium path (Alpine-compatible)
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Create app directory
+WORKDIR /usr/app
+
+# Install Chromium and required dependencies for Puppeteer
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
     ca-certificates \
-    fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
-    libatk-bridge2.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdbus-1-3 \
-    libgdk-pixbuf2.0-0 \
-    libnspr4 \
-    libnss3 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    xdg-utils \
-    --no-install-recommends && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    ttf-freefont \
+    yarn
 
-# Set the working directory
-WORKDIR /app
+# Copy package files
+COPY package.json yarn.lock ./
 
-# Copy package.json and package-lock.json (important for consistent builds)
-COPY package*.json ./
+# Install dependencies using Yarn
+RUN yarn install
 
-# Install dependencies using npm
-RUN npm install 
+# Copy the rest of the project
+COPY . .
 
-# Copy the
+# Build the project (e.g. if using TypeScript or a bundler)
+RUN yarn build
+
+# Install PM2 globally
+RUN yarn global add pm2
+
+# Expose your app's port
+EXPOSE 3000
+
+# Start the app with PM2
+CMD ["pm2-runtime", "dist/app.js"]
