@@ -14,17 +14,30 @@ export const convertInvoiceHtmlToPdf = async (
   const browser = await puppeteer.launch({
     executablePath:
       process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage", // Important for limited memory in Railway
+    ],
+    headless: true,
+    timeout: 0, // Disable browser launch timeout
   });
 
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    // Set a higher timeout (default is 30s)
+    await page.setContent(html, {
+      waitUntil: "load", // Try 'load' instead of 'networkidle0'
+      timeout: 60000, // 60 seconds timeout
+    });
+
     await page.pdf({
       path: filePath,
       format: "A4",
       printBackground: true,
     });
+
     return filePath;
   } catch (error) {
     console.error("Failed to generate PDF:", error);
