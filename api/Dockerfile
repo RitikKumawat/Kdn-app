@@ -3,27 +3,34 @@ FROM node:20-alpine
 # Set timezone
 ENV TZ="Asia/Kolkata"
 
-# Set Puppeteer Chromium path (Alpine-compatible)
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Create app directory
-WORKDIR /usr/app
 
 # Install Chromium and required dependencies for Puppeteer
 RUN apk add --no-cache \
+    build-base \
+    cairo-dev \
+    pango-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
     chromium \
     nss \
     freetype \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    yarn \
+    nodejs \
+    npm \
+    python3 \
     udev \
-    bash \
-    curl \
-    dumb-init \
-    --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+    xvfb
+
+# Set correct Puppeteer environment variables
+ENV PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+RUN mkdir -p /usr/app/
+WORKDIR /usr/app
 
 # Copy package files
 COPY package.json yarn.lock ./
