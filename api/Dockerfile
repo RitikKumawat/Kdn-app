@@ -17,7 +17,13 @@ RUN apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    yarn
+    yarn \
+    udev \
+    bash \
+    curl \
+    dumb-init \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
+    --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
 # Copy package files
 COPY package.json yarn.lock ./
