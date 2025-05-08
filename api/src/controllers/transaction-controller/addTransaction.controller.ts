@@ -43,22 +43,22 @@ export const addTransaction = async (req: Request, res: Response) => {
     };
 
     // Generate unique filename
-    const uniqueFileName = `${customer._id}_${generateUniqueFileName()}`;
+    // const uniqueFileName = `${customer._id}_${generateUniqueFileName()}`;
 
-    // Generate invoice PDF
-    const generatePdfPath = await convertInvoiceHtmlToPdf(
-      invoiceTemplate({
-        name: `${customer.firstName} ${customer.lastName}`,
-        amount,
-        paymentMode,
-      }),
-      uniqueFileName
-    );
+    // // Generate invoice PDF
+    // const generatePdfPath = await convertInvoiceHtmlToPdf(
+    //   invoiceTemplate({
+    //     name: `${customer.firstName} ${customer.lastName}`,
+    //     amount,
+    //     paymentMode,
+    //   }),
+    //   uniqueFileName
+    // );
 
-    // Add PDF path if successful
-    if (generatePdfPath) {
-      transactionData.pdfPath = generateFileUrl(req, generatePdfPath);
-    }
+    // // Add PDF path if successful
+    // if (generatePdfPath) {
+    //   transactionData.pdfPath = generateFileUrl(req, generatePdfPath);
+    // }
 
     // Save transaction in database
     const transaction = await dao.transaction.addTransaction(transactionData);
